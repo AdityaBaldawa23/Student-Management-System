@@ -18,9 +18,12 @@ void UpdateStudent(void);
 void SearchStudent(void);
 void DeleteStudent(void);
 void DisplayStudents(void);
+void SaveTableToFile(void);
+void LoadFromFile(void);
 
 int main(void)
 {
+    LoadFromFile();
     int iChoice;
 
     while (iContinue)
@@ -53,42 +56,53 @@ int main(void)
             break;
 
         case 6:
+            SaveTableToFile();
             return 0;
 
         default:
             printf("Enter a valid operation choice!!\n");
         }
     }
+
+    getch();
     return 0;
 }
 
 void AddStudent(void)
 {
     iContinue = 0;
-    if (StudentCount >= MAX)
+    int iNumberOfStudentsToAdd, iCounter;
+
+    printf("Enter the number of students you want to add:\t");
+    scanf("%d", &iNumberOfStudentsToAdd);
+
+    for (iCounter = 0; iCounter < iNumberOfStudentsToAdd; iCounter++)
     {
-        printf("Max Student Limit Reached!!");
-        return;
+        if (StudentCount >= MAX)
+        {
+            printf("Max Student Limit Reached!!");
+            return;
+        }
+        struct Student student;
+
+        getchar();
+        printf("To add a student:\n");
+        printf("Enter Name:\t");
+        gets(student.chName);
+
+        student.iId = StudentCount + 1;
+
+        printf("Enter Year of Study:\t");
+        scanf("%d", &student.iYear);
+
+        printf("Enter CGPA of the Student:\t");
+        scanf("%f", &student.fCGPA);
+
+        arrStudents[StudentCount] = student;
+        StudentCount++;
+
+        printf("Student Data Added Succesfully!!\n");
     }
-    struct Student student;
-
-    getchar();
-    printf("To add a student:\n");
-    printf("Enter Name:\t");
-    scanf("%[^\n]", &student.chName);
-
-    student.iId = StudentCount;
-
-    printf("Enter Year of Study:\t");
-    scanf("%d", &student.iYear);
-
-    printf("Enter CGPA of the Student:\t");
-    scanf("%f", &student.fCGPA);
-
-    arrStudents[StudentCount] = student;
-    StudentCount++;
-
-    printf("Student Data Added Succesfully!!\n");
 
     printf("To continue enter 1");
     scanf("%d", &iContinue);
@@ -107,7 +121,7 @@ void UpdateStudent(void)
         {
             getchar();
             printf("Enter Name:\t");
-            scanf("%[^\n]", arrStudents[iCounter].chName);
+            gets(arrStudents[iCounter].chName);
 
             printf("Enter year of Student:\t");
             scanf("%d", &arrStudents[iCounter].iYear);
@@ -141,14 +155,14 @@ void SearchStudent(void)
         {
             printf("Name: %s\n", arrStudents[iCounter].chName);
 
-            printf("Year of Study: %d", arrStudents[iCounter].iYear);
+            printf("Year of Study: %d\n", arrStudents[iCounter].iYear);
 
-            printf("CGPA of Student: %f", arrStudents[iCounter].fCGPA);
+            printf("CGPA of Student: %f\n", arrStudents[iCounter].fCGPA);
 
             return;
         }
     }
-    printf("NO such student exists!!\n");
+    printf("No such student exists!!\n");
 
     printf("To continue enter 1");
     scanf("%d", &iContinue);
@@ -199,4 +213,72 @@ void DisplayStudents(void)
     }
     printf("To continue enter 1");
     scanf("%d", &iContinue);
+}
+
+void SaveTableToFile(void)
+{
+    FILE *fp = fopen("student_table.txt", "w");
+    if (fp == NULL)
+    {
+        printf("Error saving data to file!\n");
+        return;
+    }
+
+    fseek(fp, 0,SEEK_END);
+
+    if(ftell(fp) == 0)
+    {
+        fprintf(fp, "%-5s %-20s %-5s %-5s\n", "ID", "Name", "Year", "CGPA");
+        fprintf(fp, "--------------------------------------------\n");
+    }
+
+
+    for (int i = 0; i < StudentCount; i++)
+    {
+        fprintf(fp, "%-5d %-20s %-5d %-5.2f\n",
+                arrStudents[i].iId,
+                arrStudents[i].chName,
+                arrStudents[i].iYear,
+                arrStudents[i].fCGPA);
+    }
+
+    fclose(fp);
+    printf("Data saved successfully in table format to file.\n");
+}
+
+void LoadFromFile(void)
+{
+    FILE *fp = fopen("student_table.txt", "r");
+    if (fp == NULL)
+    {
+        printf("No previous data found. Starting fresh.\n");
+        return;
+    }
+
+    char buffer[200];
+    int maxId = 0;
+
+    // Skip the header
+    fgets(buffer, sizeof(buffer), fp); // Skip "ID    Name..."
+    fgets(buffer, sizeof(buffer), fp); // Skip "--------------------------------------------"
+
+    // Read student data from the file
+    while (fscanf(fp, "%d %s %d %f\n",
+                  &arrStudents[StudentCount].iId,
+                  arrStudents[StudentCount].chName,
+                  &arrStudents[StudentCount].iYear,
+                  &arrStudents[StudentCount].fCGPA) == 4)
+    {
+        if (arrStudents[StudentCount].iId > maxId)
+        {
+            maxId = arrStudents[StudentCount].iId; // Update max ID
+        }
+        StudentCount++;
+    }
+
+    fclose(fp);
+    printf("Data loaded successfully from file.\n");
+
+    // Ensure new students get unique IDs
+    StudentCount = maxId;
 }
