@@ -14,5 +14,13 @@ void UpdateStudent(void);
 void DeleteStudent(void);
 void SearchStudent(void);
 void DisplayStudents(void);
+void SortStudentsByCgpa(void);
+void SortStudentsByName(void);
+void SortStudentsByYear(void);
+void FreeMemory(void);
+void EnsureCapacity(void);
+void LoadFromFile(void);
+void SaveTableToFile(void);
+
 
 #endif

@@ -4,14 +4,6 @@
 #include <string.h>
 #include "Student.h"
 
-struct Student
-{
-    int iId;
-    int iYear;
-    char chName[50];
-    float fCGPA;
-};
-
 struct Student *arrStudents = NULL;
 int StudentCount = 0;
 int Capacity = 0;
@@ -293,7 +285,7 @@ void SaveTableToFile(void)
     if (fp == NULL)
     {
         printf("Error saving data to file!\n");
-        return;
+        // return;
     }
 
     fseek(fp, 0, SEEK_END);
