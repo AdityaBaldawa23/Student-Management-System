@@ -1,5 +1,6 @@
 ID    Name                 Year  CGPA 
 --------------------------------------------
+4     Klass                1     2.10 
+2     Neil                 3     7.67 
 1     Aditya               2     8.52 
-2     Rishii               2     8.62 
-3     Neil                 2     7.57 
+3     Kasturi              3     9.90 
